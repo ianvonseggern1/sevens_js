@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "develop": "webpack-dev-server --output-public-path=output/ --mode development",
+    "build": "webpack --mode production"
+  },
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "npm": "^5.10.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.10"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.1.9"
+  }
+}
