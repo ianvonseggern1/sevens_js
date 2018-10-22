@@ -130,6 +130,25 @@ export default class Model {
     });
   }
 
+  // For a given popMask this returns how far each piece will end up falling
+  // during the perform pop. This utility allows animation of that process,
+  // it isn't required for simulations which can simply call the performPop
+  // method
+  // NOTE: for simplicity this mask shows how far a piece would fall if there
+  // were a piece in that square. It doesn't mean there is a piece there however
+  getDistanceToDropMask(popMask) {
+    return this.board.map((column, columnIndex) => {
+      let totalPopsInCol = 0;
+      return column.map((piece, rowIndex) => {
+        if (popMask[columnIndex][rowIndex]) {
+          totalPopsInCol += 1;
+          return totalPopsInCol - 1;
+        }
+        return totalPopsInCol;
+      });
+    });
+  }
+
   // Any time a piece pops next to a gray piece, that gray piece becomes a
   // numbered piece. A double gray becomes a gray. If two pieces pop next to
   // a double gray it becomes numbered. This tallies the pops adjacent to a

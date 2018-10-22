@@ -10,24 +10,39 @@ export default class Grid extends React.Component {
     var pieces = [];
     this.props.board.forEach((column, columnIndex) => {
       column.forEach((piece, rowIndex) => {
-        if (piece !== null) {
-          var animate = null;
-          if (
-            this.props.popAnimationProgress &&
-            this.props.popMask &&
-            this.props.popMask[columnIndex][rowIndex]
-          ) {
-            animate = this.props.popAnimationProgress;
+        if (piece === null) {
+          return;
+        }
+
+        var popAnimateScale = null;
+        if (
+          this.props.popAnimationProgress &&
+          this.props.popMask &&
+          this.props.popMask[columnIndex][rowIndex]
+        ) {
+          popAnimateScale = this.props.popAnimationProgress;
+        }
+
+        let dropDistance = 0;
+        if (this.props.dropAnimationProgress && this.props.dropMask) {
+          // Don't render popped pieces if we are in the dropping phase
+          if (this.props.popMask && this.props.popMask[columnIndex][rowIndex]) {
+            return;
           }
-          pieces.push(
-            <Piece
-              key={`c${columnIndex}r${rowIndex}`}
-              value={piece}
-              columnIndex={columnIndex}
-              rowIndex={rowIndex}
-              animate={animate} />
+          dropDistance = Math.min(
+            this.props.dropMask[columnIndex][rowIndex],
+            this.props.dropAnimationProgress,
           );
         }
+
+        pieces.push(
+          <Piece
+            key={`c${columnIndex}r${rowIndex}`}
+            value={piece}
+            columnIndex={columnIndex}
+            rowIndex={rowIndex - dropDistance}
+            animate={popAnimateScale} />
+        );
       });
     });
 
