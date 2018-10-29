@@ -19,6 +19,7 @@ export default class Game extends React.Component {
     model.setup();
     this.state = {
       model: model,
+      newPieceAnimationProgress: null,
       popAnimationProgress: null,
       dropAnimationProgress: null,
     };
@@ -106,9 +107,28 @@ export default class Game extends React.Component {
     setTimeout(() => this.animateDrops(completion), 50);
   }
 
+  animateNewPiece(column, dropDistance, completion) {
+    let STEP_SIZE = 0.1;
+
+    if (this.state.newPieceAnimationProgress >= dropDistance) {
+      this.setState(
+        {newPieceAnimationProgress: null},
+        completion,
+      );
+      return;
+    }
+
+    this.setState({
+        newPieceColumn: column,
+        newPieceAnimationProgress: (this.state.newPieceAnimationProgress || 0) + STEP_SIZE,
+    });
+    setTimeout(() => this.animateNewPiece(column, dropDistance, completion), 30);
+  }
+
   onClick(event) {
     // Can't drop a piece while the previous one is still being animated
     if (
+      this.state.newPieceAnimationProgress !== null ||
       this.state.popAnimationProgress !== null ||
       this.state.dropAnimationProgress !== null
     ) {
@@ -117,13 +137,15 @@ export default class Game extends React.Component {
 
     let column = Math.floor(event.clientX / Piece.SQUARE_SIZE);
 
-    // TODO this probably shouldn't mutate the model, simply return a new board
-    let canDrop = this.state.model.dropNextPiece(column);
-    if (!canDrop) {
+    let dropDistance = this.state.model.getDropDistance(column);
+    if (dropDistance === 0) {
       return;
     }
-    this.setState({model: this.state.model});
-    this.popUntilDone(true);
+    this.animateNewPiece(column, dropDistance, () => {
+      this.state.model.dropNextPiece(column);
+      this.setState({model: this.state.model});
+      this.popUntilDone(true);
+    });
   }
 
   render() {
@@ -136,13 +158,18 @@ export default class Game extends React.Component {
           <Remaining count={this.state.model.piecesLeftInRound} />
           <Score score={this.state.model.score} />
         </div>
-        <ToDrop piece={this.state.model.nextPiece} />
         <Grid
           board={this.state.model.board}
           popMask={this.state.popMask}
           dropMask={this.state.dropMask}
           popAnimationProgress={this.state.popAnimationProgress}
-          dropAnimationProgress={this.state.dropAnimationProgress} />
+          dropAnimationProgress={this.state.dropAnimationProgress}>
+          <ToDrop
+            animationProgress={this.state.newPieceAnimationProgress}
+            column={this.state.newPieceColumn}
+            piece={this.state.model.nextPiece}
+          />
+        </Grid>
         <StrategyValues
           strategy={this.props.strategy}
           model={this.state.model}

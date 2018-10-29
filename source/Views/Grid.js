@@ -55,6 +55,7 @@ export default class Grid extends React.Component {
         marginTop: Piece.SQUARE_SIZE
       }}>
         {pieces}
+        {this.props.children}
       </div>
     );
   }

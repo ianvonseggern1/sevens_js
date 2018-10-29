@@ -102,6 +102,17 @@ export default class Model {
     return true;
   }
 
+  // Returns how many rows a piece would fall if dropped in that column.
+  // 1 is the top row, 2 the second from the top etc. If the column is full
+  // this function will return 0
+  getDropDistance(column) {
+    let row = this.board[column].indexOf(null);
+    if (row === -1) {
+      return 0;
+    }
+    return (Model.SIZE - row);
+  }
+
   // The rule of drop 7 is the any piece whos value matches the total number
   // of pieces in that column or the total number of pieces adjacent in the row
   // is 'popped'
